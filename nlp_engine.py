@@ -18,13 +18,18 @@ import spacy
 from spacy import displacy
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity as sk_cosine_sim
-_NLTK_PACKAGES = ['tokenizers/punkt', 'tokenizers/punkt_tab', 'corpora/stopwords', 'corpora/wordnet', 'taggers/averaged_perceptron_tagger', 'corpora/brown']
+_NLTK_PACKAGES = ['tokenizers/punkt', 'tokenizers/punkt_tab', 'corpora/stopwords', 'corpora/wordnet', 'taggers/averaged_perceptron_tagger', 'taggers/averaged_perceptron_tagger_eng', 'corpora/brown']
 for _pkg in _NLTK_PACKAGES:
     try:
         nltk.data.find(_pkg)
     except LookupError:
         nltk.download(_pkg.split('/')[-1], quiet=True)
-_nlp_spacy = spacy.load('en_core_web_sm')
+try:
+    _nlp_spacy = spacy.load('en_core_web_sm')
+except OSError:
+    import spacy.cli
+    spacy.cli.download('en_core_web_sm')
+    _nlp_spacy = spacy.load('en_core_web_sm')
 
 class Preprocessor:
 
