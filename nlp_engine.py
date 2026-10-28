@@ -18,7 +18,7 @@ import spacy
 from spacy import displacy
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity as sk_cosine_sim
-_NLTK_PACKAGES = ['tokenizers/punkt', 'tokenizers/punkt_tab', 'corpora/stopwords', 'corpora/wordnet', 'taggers/averaged_perceptron_tagger', 'taggers/averaged_perceptron_tagger_eng', 'corpora/brown']
+_NLTK_PACKAGES = ['tokenizers/punkt', 'tokenizers/punkt_tab', 'corpora/stopwords', 'corpora/wordnet', 'corpora/omw-1.4', 'taggers/averaged_perceptron_tagger', 'taggers/averaged_perceptron_tagger_eng', 'taggers/universal_tagset', 'corpora/brown']
 for _pkg in _NLTK_PACKAGES:
     try:
         nltk.data.find(_pkg)
@@ -79,7 +79,12 @@ class HMMPosTagger:
         self._train()
 
     def _train(self):
-        tagged_sents = brown.tagged_sents(tagset='universal')
+        try:
+            tagged_sents = list(brown.tagged_sents(tagset='universal'))
+        except LookupError:
+            nltk.download('universal_tagset', quiet=True)
+            nltk.download('brown', quiet=True)
+            tagged_sents = list(brown.tagged_sents(tagset='universal'))
         tag_counts = defaultdict(int)
         trans_counts = defaultdict(lambda: defaultdict(int))
         emiss_counts = defaultdict(lambda: defaultdict(int))
